@@ -1,0 +1,677 @@
+{
+  "version": "1.0.0",
+  "updated": "2026-01-06",
+  "description": "平台识别规则表。Python 核心库与 Android 端共享同一份数据文件，修改规则后两端生效，无需改代码。",
+  "match_policy": [
+    "1. 从二维码内容里取出第一个 http(s) URL，用它的 host 做域名后缀匹配（最长后缀优先，weixin.qq.com 优先于 qq.com）。",
+    "2. host 命中 denylist 时视为未识别，避免把腾讯视频/邮箱等二维码误判成 QQ 登录码。",
+    "3. 内容里没有合法 URL 时，才退化为全文关键词匹配；这类 loose 匹配一律禁用自动跳转，只做提示。",
+    "4. 非 http(s) 的 scheme（weixin://、mqq:// 等）直接拒绝，防止把二维码内容当跳转目标造成 scheme 注入。",
+    "5. 完全没有 URL 时才退化为文字线索匹配：先找 url_keywords，再找域名，最后才看中文别名；且文本必须含扫码/登录语境词，结果一律标记为 loose 并禁用自动跳转。",
+    "6. scan_entry.deep_links 是「直达扫一扫」的候选常量（按优先级排列），来源是对官方 APK 的 AndroidManifest 实测；仍只允许常量，禁止拼接二维码内容。",
+    "7. extra_schemes 记录平台的其它合法 scheme（如 QQ 的 mqqapi 用于 API 调用、mqq 用于打开主界面）；一致性检查会要求扫一扫深链的 scheme 必须落在 deep_link 或 extra_schemes 里，防止跳错 App。",
+    "8. 平台域名可能互相包含（work.weixin.qq.com 属于企业微信，weixin.qq.com 属于微信），匹配必须按域名长度降序，先长后短。"
+  ],
+  "platforms": [
+    {
+      "id": "wechat",
+      "display_name": "微信",
+      "domains": [
+        "weixin.qq.com",
+        "wx.qq.com",
+        "wx2.qq.com",
+        "wechat.com"
+      ],
+      "url_keywords": [
+        "weixin.qq.com",
+        "wx.qq.com",
+        "wx2.qq.com",
+        "login.weixin.qq.com"
+      ],
+      "host_denylist": [],
+      "deep_link": "weixin://",
+      "deep_link_kind": "app_launch_only",
+      "android_packages": [
+        "com.tencent.mm"
+      ],
+      "ios_bundles": [
+        "com.tencent.xin"
+      ],
+      "desktop_programs": {
+        "linux": [
+          "wechat",
+          "weixin",
+          "electronic-wechat"
+        ],
+        "darwin": [
+          "WeChat",
+          "微信"
+        ],
+        "windows": [
+          "WeChat.exe",
+          "Weixin.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.tencent.mm",
+        "ios": "https://apps.apple.com/cn/app/id414478124",
+        "web": "https://weixin.qq.com/"
+      },
+      "password_login_url": null,
+      "password_login_note": "微信网页版只支持扫码登录，没有账号密码登录入口，因此不提供兜底链接。",
+      "scan_target_hint": "扫一扫（首页右上角「+」）",
+      "notes": "官方登录二维码内容是 https://login.weixin.qq.com/qrcode/... 之类的链接；票据由微信客户端自己上报，第三方无法代扫。",
+      "text_aliases": [
+        "微信",
+        "weixin",
+        "wechat"
+      ],
+      "scan_entry": {
+        "supported": false,
+        "deep_links": [],
+        "verified_against": "com.tencent.mm 8.0.79 (versionCode 3200)",
+        "source": "反编译 com.tencent.mm.plugin.base.stub.WXCustomSchemeEntryActivity（微信唯一对外、exported=true 的 weixin:// 入口）后确认：它的 onCreate 只对 6 类 host 做分发 —— cardpackage / connectToFreeWifi / wap / pay / yuanbao / wxpay，兜底分支会打印 \"host[%s] hit but no inner branch matched\"。因此 host 为 dl 或 scanqrcode 的 URL 都不会被处理。weixin://dl/scan 实际出现在微信内部 webview 的 URL 权限位映射表（Map<String,Long>，scan→64），属于内部路由，不对外开放。",
+        "note": "微信官方没有给第三方开放「打开扫一扫」。系统扫一扫（如 Flyme）能直达，是因为系统应用持有 START_ANY_ACTIVITY 特权，可以启动微信 exported=false 的扫一扫界面（com.tencent.mm.plugin.scanner.ui.BaseScanUI）；普通第三方 App 无法做到，本助手因此退化为「打开微信主界面，请用户自己点扫一扫」。被排除的候选：weixin://dl/scan、weixin://scanqrcode/（均验证无效）。"
+      },
+      "extra_schemes": []
+    },
+    {
+      "id": "dingtalk",
+      "display_name": "钉钉",
+      "domains": [
+        "dingtalk.com",
+        "dingtalk.cn"
+      ],
+      "url_keywords": [
+        "dingtalk.com",
+        "login.dingtalk.com",
+        "oapi.dingtalk.com"
+      ],
+      "host_denylist": [],
+      "deep_link": "dingtalk://",
+      "deep_link_kind": "app_launch_only",
+      "android_packages": [
+        "com.alibaba.android.rimet"
+      ],
+      "ios_bundles": [
+        "com.laiwang.DingTalk"
+      ],
+      "desktop_programs": {
+        "linux": [
+          "dingtalk",
+          "com.alibaba.android.rimet"
+        ],
+        "darwin": [
+          "DingTalk",
+          "钉钉"
+        ],
+        "windows": [
+          "DingTalk.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.alibaba.android.rimet",
+        "ios": "https://apps.apple.com/cn/app/id930368978",
+        "web": "https://www.dingtalk.com/download"
+      },
+      "password_login_url": "https://login.dingtalk.com/",
+      "password_login_note": "钉钉网页版支持账号密码登录，二维码失效时可直接改用该入口。",
+      "scan_target_hint": "扫一扫",
+      "notes": "登录二维码通常来自 login.dingtalk.com / oapi.dingtalk.com。",
+      "text_aliases": [
+        "钉钉",
+        "dingtalk",
+        "dingding"
+      ],
+      "scan_entry": {
+        "supported": true,
+        "deep_links": [
+          "dingtalk://dingtalkclient/page/scan",
+          "dingtalk://qr.dingtalk.com/page/scan",
+          "dingtalk://dingtalkclient/page/scan_new"
+        ],
+        "verified_against": "com.alibaba.android.rimet 9.0.1.3 (versionCode 1276)",
+        "source": "解析官方 APK 的 AndroidManifest.xml：exported=true 的 com.alibaba.android.rimet.biz.BokuiActivity 注册了 host=dingtalkclient/qr.dingtalk.com + path=/page/scan；对应的 com.taobao.ma.ui.ScanActivity 虽注册同一 URL 但 exported=false，只能由钉钉内部自己拉起。",
+        "note": "钉钉所有 filter 都带 host，所以裸 dingtalk:// 解析不到任何组件（这正是第一版报「找不到 App」的原因）；必须带 host+path。"
+      },
+      "extra_schemes": []
+    },
+    {
+      "id": "qq",
+      "display_name": "QQ",
+      "domains": [
+        "qq.com"
+      ],
+      "url_keywords": [
+        "qun.qq.com",
+        "xui.ptlogin2.qq.com",
+        "ptlogin2.qq.com",
+        "w.qq.com",
+        "im.qq.com"
+      ],
+      "host_denylist": [
+        "v.qq.com",
+        "y.qq.com",
+        "i.qq.com",
+        "mail.qq.com",
+        "news.qq.com",
+        "sports.qq.com",
+        "new.qq.com",
+        "om.qq.com"
+      ],
+      "deep_link": "mqq://",
+      "deep_link_kind": "app_launch_only",
+      "android_packages": [
+        "com.tencent.mobileqq"
+      ],
+      "ios_bundles": [
+        "com.tencent.mqq"
+      ],
+      "desktop_programs": {
+        "linux": [
+          "qq",
+          "linuxqq"
+        ],
+        "darwin": [
+          "QQ"
+        ],
+        "windows": [
+          "QQ.exe",
+          "QQScLauncher.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.tencent.mobileqq",
+        "ios": "https://apps.apple.com/cn/app/id444934666",
+        "web": "https://im.qq.com/mobileqq/"
+      },
+      "password_login_url": "https://xui.ptlogin2.qq.com/",
+      "password_login_note": "QQ 网页登录入口（具体页面以官方为准），二维码不可用时可改用账号密码登录。",
+      "scan_target_hint": "扫一扫",
+      "notes": "qq.com 是较短后缀，因此必须先做最长后缀匹配，否则会把 login.weixin.qq.com 误判为 QQ；denylist 用来排除腾讯视频、邮箱等非登录站点。",
+      "text_aliases": [
+        "QQ",
+        "腾讯QQ"
+      ],
+      "scan_entry": {
+        "supported": true,
+        "deep_links": [
+          "mqqapi://qrscan/open?source=1",
+          "mqqapi://qrscan"
+        ],
+        "verified_against": "com.tencent.mobileqq 9.3.75 (versionCode 16580)",
+        "source": "QQ 的对外入口 com.tencent.mobileqq.activity.JumpActivity（exported=true，mqqapi scheme 不带 host）内部按路由分发，manifest 同样看不到扫一扫组件。dex 中可见 mqqapi://qrscan 与 mqqapi://qrscan/open?source=1，并与 com.tencent.mobileqq.qrscan.* 模块同处一个 dex。",
+        "note": "mqq:// 下没有扫一扫路由（只有 card/shop/jubao 等），必须用 mqqapi://qrscan；参数只带 source，不带任何二维码内容。"
+      },
+      "extra_schemes": [
+        "mqqapi"
+      ]
+    },
+    {
+      "id": "alipay",
+      "display_name": "支付宝",
+      "domains": [
+        "qr.alipay.com",
+        "auth.alipay.com",
+        "login.alipay.com",
+        "alipay.com"
+      ],
+      "url_keywords": [
+        "qr.alipay.com",
+        "auth.alipay.com",
+        "login.alipay.com"
+      ],
+      "text_aliases": [
+        "支付宝",
+        "alipay"
+      ],
+      "host_denylist": [],
+      "deep_link": "alipays://",
+      "deep_link_kind": "app_launch_only",
+      "android_packages": [
+        "com.eg.android.AlipayGphone"
+      ],
+      "ios_bundles": [
+        "com.alipay.iphoneclient"
+      ],
+      "desktop_programs": {
+        "linux": [
+          "alipay"
+        ],
+        "darwin": [
+          "Alipay"
+        ],
+        "windows": [
+          "Alipay.exe",
+          "alipay.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.eg.android.AlipayGphone",
+        "ios": "https://apps.apple.com/cn/app/id333206289",
+        "web": "https://www.alipay.com/"
+      },
+      "password_login_url": "https://auth.alipay.com/login/index.htm",
+      "password_login_note": "支付宝网页版支持账号密码登录，二维码失效时可直接改用该入口。",
+      "scan_target_hint": "扫一扫",
+      "scan_entry": {
+        "supported": true,
+        "deep_links": [
+          "alipays://platformapi/startapp?appId=10000007"
+        ],
+        "verified_against": "com.eg.android.AlipayGphone 12.12.30.8000 (versionCode 212310)",
+        "source": "解析官方 APK：exported=true 的 com.alipay.mobile.quinox.SchemeLauncherActivity 注册了 scheme=alipays 且不带 host，因此任意 alipays:// URL 都能进入支付宝自己的路由。appId=10000007 即扫一扫，依据是 APK 内部配置中的 alipays://platformapi/startapp?appId=10000007&source=nougat_shortcut&sourceId=nougat_shortcut_scan、桌面小组件资源 local://widget_pay_scan，以及场景映射里 ch_appid-10000007 与 ch_scan 落在同一场景码。",
+        "note": "裸 alipays:// 也能打开支付宝（SchemeLauncherActivity 不限 host）；直达扫一扫必须带 platformapi/startapp?appId=10000007。"
+      },
+      "notes": "PC 端扫码登录的二维码域名以 qr.alipay.com 为主，auth.alipay.com / login.alipay.com 是网页登录入口。",
+      "extra_schemes": []
+    },
+    {
+      "id": "bilibili",
+      "display_name": "哔哩哔哩",
+      "domains": [
+        "passport.bilibili.com",
+        "passport.biligame.com",
+        "bilibili.com",
+        "b23.tv"
+      ],
+      "url_keywords": [
+        "passport.bilibili.com",
+        "bilibili.com"
+      ],
+      "text_aliases": [
+        "哔哩哔哩",
+        "bilibili",
+        "B站",
+        "b站"
+      ],
+      "host_denylist": [],
+      "deep_link": "bilibili://",
+      "deep_link_kind": "app_launch_only",
+      "extra_schemes": [],
+      "android_packages": [
+        "tv.danmaku.bili"
+      ],
+      "ios_bundles": [
+        "tv.danmaku.bilianime"
+      ],
+      "desktop_programs": {
+        "linux": [
+          "bilibili"
+        ],
+        "darwin": [
+          "bilibili"
+        ],
+        "windows": [
+          "bilibili.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=tv.danmaku.bili",
+        "ios": "https://apps.apple.com/cn/app/id736536022",
+        "web": "https://app.bilibili.com/"
+      },
+      "password_login_url": "https://passport.bilibili.com/login",
+      "password_login_note": "哔哩哔哩支持账号密码 / 短信登录，二维码失效时可直接改用该入口。",
+      "scan_target_hint": "扫一扫",
+      "scan_entry": {
+        "supported": true,
+        "deep_links": [
+          "bilibili://qrscan"
+        ],
+        "activity_classes": [],
+        "verified_against": "tv.danmaku.bili 9.15.0 (versionCode 9150300)",
+        "source": "manifest 中 exported=true 的 tv.danmaku.bili.ui.intent.IntentHandlerActivity 显式注册了 host=qrscan；同一 activity 另有 host=qrcode（那是展示自己的二维码）",
+        "note": "另外 bilibili://qrcode 是展示本机二维码，不是扫一扫，未采用。"
+      },
+      "notes": "PC 扫码登录二维码域名以 passport.bilibili.com 为主。"
+    },
+    {
+      "id": "wework",
+      "display_name": "企业微信",
+      "domains": [
+        "open.work.weixin.qq.com",
+        "work.weixin.qq.com"
+      ],
+      "url_keywords": [
+        "work.weixin.qq.com"
+      ],
+      "text_aliases": [
+        "企业微信",
+        "wecom",
+        "wxwork",
+        "企微"
+      ],
+      "host_denylist": [],
+      "deep_link": "wxwork://",
+      "deep_link_kind": "app_launch_only",
+      "extra_schemes": [
+        "wxworkapi"
+      ],
+      "android_packages": [
+        "com.tencent.wework"
+      ],
+      "ios_bundles": [
+        "com.tencent.ww"
+      ],
+      "desktop_programs": {
+        "linux": [
+          "wework"
+        ],
+        "darwin": [
+          "企业微信"
+        ],
+        "windows": [
+          "WXWork.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.tencent.wework",
+        "ios": "https://apps.apple.com/cn/app/id1081022010",
+        "web": "https://work.weixin.qq.com/#indexDownload"
+      },
+      "password_login_url": "https://work.weixin.qq.com/",
+      "password_login_note": "企业微信管理后台与网页版支持账号密码 / 短信登录，二维码失效时可改用该入口。",
+      "scan_target_hint": "扫一扫",
+      "scan_entry": {
+        "supported": false,
+        "deep_links": [],
+        "activity_classes": [],
+        "verified_against": "com.tencent.wework 5.0.12 (versionCode 83835)",
+        "source": "反查 manifest 与 dex：对外入口只有 com.tencent.wework.launch.AppSchemeLaunchActivity（wxwork/wework/wxworkpaid/wxworksaas/native 五个 scheme，host 为空）与 WWAPIActivity（wxworkapi），wxwork:// 下没有任何 scan/qr 路由；导出的组件里也没有扫码相关 Activity。",
+        "note": "企业微信没有对第三方开放扫一扫，只能打开主界面由用户自己点「扫一扫」。"
+      },
+      "notes": "域名必须写全 work.weixin.qq.com，否则会被微信平台的 weixin.qq.com 抢走（最长后缀优先已保证正确匹配）。"
+    },
+    {
+      "id": "baidu",
+      "display_name": "百度",
+      "domains": [
+        "passport.baidu.com",
+        "baidu.com"
+      ],
+      "url_keywords": [
+        "passport.baidu.com",
+        "baidu.com"
+      ],
+      "text_aliases": [
+        "百度",
+        "baidu"
+      ],
+      "host_denylist": [],
+      "deep_link": "baiduboxapp://",
+      "deep_link_kind": "app_launch_only",
+      "extra_schemes": [
+        "bdbox"
+      ],
+      "android_packages": [
+        "com.baidu.searchbox"
+      ],
+      "ios_bundles": [
+        "com.baidu.BaiduMobile"
+      ],
+      "desktop_programs": {
+        "linux": [
+          "baidu"
+        ],
+        "darwin": [
+          "Baidu"
+        ],
+        "windows": [
+          "Baidu.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.baidu.searchbox",
+        "ios": "https://apps.apple.com/cn/app/id382201985",
+        "web": "https://mobile.baidu.com/"
+      },
+      "password_login_url": "https://passport.baidu.com/v2/?login",
+      "password_login_note": "百度账号支持账号密码 / 短信登录，二维码失效时可直接改用该入口。",
+      "scan_target_hint": "扫一扫",
+      "scan_entry": {
+        "supported": true,
+        "deep_links": [
+          "baiduboxapp://v16/ucenter/scan"
+        ],
+        "activity_classes": [
+          "com.baidu.searchbox.barcode.entry.CodeScannerActivity",
+          "com.baidu.searchbox.CodeScannerActivity"
+        ],
+        "verified_against": "com.baidu.searchbox 15.79.0.11 (versionCode 513672576)",
+        "source": "dex 中可见 baiduboxapp://v16/ucenter/scan；另外 manifest 里 com.baidu.searchbox.barcode.entry.CodeScannerActivity 等 4 个扫码 Activity 是 exported=true，因此同时给出显式类名候选（scheme 失败时按类名再试一次）。",
+        "note": "注意 baiduboxapp://v4/account/profile/qrcode 是展示自己的二维码，不是扫一扫，未采用。"
+      },
+      "notes": "百度账号体系的登录二维码来自 passport.baidu.com。"
+    },
+    {
+      "id": "quark",
+      "display_name": "夸克",
+      "domains": [
+        "pan.quark.cn",
+        "quark.cn"
+      ],
+      "url_keywords": [
+        "quark.cn"
+      ],
+      "text_aliases": [
+        "夸克",
+        "quark"
+      ],
+      "host_denylist": [],
+      "deep_link": "quark://",
+      "deep_link_kind": "app_launch_only",
+      "extra_schemes": [
+        "uclink",
+        "qklink"
+      ],
+      "android_packages": [
+        "com.quark.browser"
+      ],
+      "ios_bundles": [
+        "com.quark.browser"
+      ],
+      "desktop_programs": {
+        "linux": [],
+        "darwin": [
+          "夸克"
+        ],
+        "windows": [
+          "Quark.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.quark.browser",
+        "ios": "https://apps.apple.com/cn/app/id1160172628",
+        "web": "https://quark.cn/"
+      },
+      "password_login_url": "https://pan.quark.cn/",
+      "password_login_note": "夸克网盘网页版支持账号密码 / 短信登录，二维码失效时可改用该入口。",
+      "scan_target_hint": "扫一扫",
+      "scan_entry": {
+        "supported": false,
+        "deep_links": [],
+        "activity_classes": [],
+        "verified_against": "com.quark.browser 10.19.0.1165 (versionCode 1165)",
+        "source": "quark:// 下只有 alipay、camera_auto_test 两个路由；uclink:// 与 qklink:// 只用于打开网页/小程序；导出的组件里没有扫码相关 Activity。",
+        "note": "夸克没有对第三方开放扫一扫，只能打开主界面由用户自己点「扫一扫」。"
+      },
+      "notes": ""
+    },
+    {
+      "id": "xiaohongshu",
+      "display_name": "小红书",
+      "domains": [
+        "xiaohongshu.com",
+        "xhslink.com"
+      ],
+      "url_keywords": [
+        "xiaohongshu.com",
+        "xhslink.com"
+      ],
+      "text_aliases": [
+        "小红书",
+        "xiaohongshu",
+        "xhs"
+      ],
+      "host_denylist": [],
+      "deep_link": "xhsdiscover://",
+      "deep_link_kind": "app_launch_only",
+      "extra_schemes": [],
+      "android_packages": [
+        "com.xingin.xhs"
+      ],
+      "ios_bundles": [
+        "com.xingin.discover"
+      ],
+      "desktop_programs": {
+        "linux": [],
+        "darwin": [
+          "小红书"
+        ],
+        "windows": [
+          "XiaoHongShu.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.xingin.xhs",
+        "ios": "https://apps.apple.com/cn/app/id741292507",
+        "web": "https://www.xiaohongshu.com/"
+      },
+      "password_login_url": null,
+      "password_login_note": "小红书网页版只支持 App 扫码登录，没有账号密码入口。",
+      "scan_target_hint": "扫一扫",
+      "scan_entry": {
+        "supported": true,
+        "deep_links": [
+          "xhsdiscover://qr_scan"
+        ],
+        "activity_classes": [],
+        "verified_against": "com.xingin.xhs 9.50.0 (versionCode 9500803)",
+        "source": "dex 中可见 xhsdiscover://qr_scan；对外路由 Activity com.xingin.xhs.routers.RouterPageActivity 是 exported=true，且已注册大量 xhsdiscover:// 子路由（qr_scan 属于同一套路由体系）。",
+        "note": "另有 xhsdiscover://qr/overdue（过期提示页），未采用。"
+      },
+      "notes": "域名 xhslink.com 是小红书分享短链。"
+    },
+    {
+      "id": "douyin",
+      "display_name": "抖音",
+      "domains": [
+        "douyin.com",
+        "iesdouyin.com"
+      ],
+      "url_keywords": [
+        "www.douyin.com",
+        "douyin.com"
+      ],
+      "text_aliases": [
+        "抖音",
+        "douyin"
+      ],
+      "host_denylist": [],
+      "deep_link": "snssdk1128://",
+      "deep_link_kind": "app_launch_only",
+      "extra_schemes": [],
+      "android_packages": [
+        "com.ss.android.ugc.aweme"
+      ],
+      "ios_bundles": [
+        "com.ss.iphone.ugc.Aweme"
+      ],
+      "desktop_programs": {
+        "linux": [],
+        "darwin": [
+          "抖音"
+        ],
+        "windows": [
+          "Douyin.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.ss.android.ugc.aweme",
+        "ios": "https://apps.apple.com/cn/app/id1142110895",
+        "web": "https://www.douyin.com/"
+      },
+      "password_login_url": null,
+      "password_login_note": "抖音网页版只支持 App 扫码登录，没有账号密码入口。",
+      "scan_target_hint": "扫一扫",
+      "scan_entry": {
+        "supported": true,
+        "deep_links": [
+          "snssdk1128://aweme/scan"
+        ],
+        "activity_classes": [],
+        "verified_against": "com.ss.android.ugc.aweme 40.7.0 (versionCode 400701)",
+        "source": "dex 中可见 snssdk1128://aweme/scan（另有带 finishAfterScan / extra_previous_page_position 参数的变体，均无二维码内容参数）；对外入口 com.ss.android.ugc.aweme.app.TransDeepLinkHandlerActivity 与 DeepLinkHandlerActivity 均为 exported=true。",
+        "note": "只取不带参数的 snssdk1128://aweme/scan，带参数的变体属于抖音内部跳转，未采用。"
+      },
+      "notes": "域名 douyin.com 覆盖 www / v / sso 等子域。"
+    },
+    {
+      "id": "steam",
+      "display_name": "Steam",
+      "domains": [
+        "s.team",
+        "steampowered.com",
+        "steamcommunity.com"
+      ],
+      "url_keywords": [
+        "s.team",
+        "steampowered.com"
+      ],
+      "text_aliases": [
+        "steam"
+      ],
+      "host_denylist": [],
+      "deep_link": "steam://",
+      "deep_link_kind": "app_launch_only",
+      "extra_schemes": [],
+      "android_packages": [
+        "com.valvesoftware.android.steam.community"
+      ],
+      "ios_bundles": [
+        "com.valvesoftware.Steam"
+      ],
+      "desktop_programs": {
+        "linux": [
+          "steam"
+        ],
+        "darwin": [
+          "Steam"
+        ],
+        "windows": [
+          "Steam.exe"
+        ]
+      },
+      "store_urls": {
+        "android": "market://details?id=com.valvesoftware.android.steam.community",
+        "ios": "https://apps.apple.com/cn/app/id495369748",
+        "web": "https://store.steampowered.com/about/"
+      },
+      "password_login_url": "https://store.steampowered.com/login/",
+      "password_login_note": "Steam 支持账号密码登录，二维码失效时可直接改用该入口。",
+      "scan_target_hint": "扫码登录（Steam Guard）",
+      "scan_entry": {
+        "supported": false,
+        "deep_links": [],
+        "activity_classes": [],
+        "verified_against": "未验证 —— 应用宝没有上架该包，未能下载官方 APK 做静态分析",
+        "source": "Steam 手机端不在国内应用商店分发，本轮无法获取官方 APK；包名与 steam:// scheme 取自公开资料，未做 manifest/dex 验证。",
+        "note": "因此只提供「识别 + 打开 Steam App」，扫一扫需用户自己点。等拿到官方 APK 再补验证。"
+      },
+      "notes": "Steam PC 登录二维码内容通常是 https://s.team/q/xxx。包名与 scheme 未经本机验证。"
+    }
+  ],
+  "credential_params": [
+    "ticket",
+    "login_ticket",
+    "uuid",
+    "scene",
+    "code",
+    "qrcode",
+    "qr_id",
+    "session",
+    "token",
+    "sig"
+  ]
+}

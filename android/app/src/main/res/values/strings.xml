@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">小助手</string>
+
+    <!-- 首页（功能菜单） -->
+    <string name="home_subtitle">常用工具集合，功能陆续添加</string>
+    <string name="home_footer">更多功能正在路上</string>
+    <string name="chevron">›</string>
+
+    <!-- 功能：扫码登录助手 -->
+    <string name="tool_scan_login_title">扫码登录助手</string>
+    <string name="tool_scan_login_desc">扫描 PC 登录页二维码，自动识别平台并打开对应 App（微信 / 钉钉 / QQ / 支付宝）</string>
+    <string name="scan_subtitle">对准 PC 屏幕上的登录二维码，登录确认始终在官方 App 内完成</string>
+
+    <!-- 功能：随机事件 -->
+    <string name="tool_random_title">随机事件</string>
+    <string name="tool_random_desc">掷骰子、抛硬币、抽数字，点一下就来</string>
+    <string name="random_placeholder">—</string>
+
+    <string name="random_hint_dice">点击骰子摇一次，右下角可改数量</string>
+    <string name="random_hint_coin">点击硬币抛一次（一面字、一面标志）</string>
+    <string name="random_hint_number">指定范围与个数，点「抽！」</string>
+
+    <string name="random_dice_total">总点数 %1$d</string>
+    <string name="random_dice_count_short">🎲 ×%1$d</string>
+    <string name="random_dice_count_n">%1$d 颗</string>
+    <string name="random_dice_count_title">骰子数量</string>
+
+    <string name="random_coin_head">正面</string>
+    <string name="random_coin_tail">反面</string>
+    <string name="random_coin_stats">正面 %1$d 次 · 反面 %2$d 次 · 共 %3$d 次</string>
+
+    <string name="random_number_unique">结果不重复</string>
+    <string name="random_number_draw">抽！</string>
+    <string name="random_number_range">从 %1$d 到 %2$d 抽 %3$d 个</string>
+    <string name="random_number_invalid">请填写有效的范围与个数</string>
+
+
+    <string name="hint_scanning">对准 PC 屏幕上的登录二维码</string>
+
+    <string name="action_open_app">打开官方 App</string>
+    <string name="action_password_login">改用账号密码</string>
+    <string name="action_download">去下载官方 App</string>
+    <string name="action_rescan">重新扫描</string>
+
+    <string name="error_camera_permission">没有相机权限就无法扫码。请在系统设置里允许相机权限后重试。</string>
+    <string name="error_no_camera">没有找到可用的摄像头。</string>
+    <string name="error_cannot_open_app">打不开对应的页面，可能应用已被卸载或停用，请手动打开。</string>
+    <string name="hint_open_app_manually">找不到%1$s的启动入口，请手动打开该 App 后点「扫一扫」</string>
+</resources>

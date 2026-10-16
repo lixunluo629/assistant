@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface">
+
+    <HorizontalScrollView
+        android:id="@+id/tabScroll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:paddingHorizontal="16dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/tabRow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tabDice"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_tab_chip"
+            android:gravity="center"
+            android:minWidth="96dp"
+            android:paddingHorizontal="22dp"
+            android:text="掷骰子"
+            android:textColor="@color/tab_text_color"
+            android:textSize="15sp" />
+        <TextView
+            android:id="@+id/tabCoin"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_tab_chip"
+            android:gravity="center"
+            android:minWidth="96dp"
+            android:paddingHorizontal="22dp"
+            android:text="抛硬币"
+            android:textColor="@color/tab_text_color"
+            android:textSize="15sp" />
+        <TextView
+            android:id="@+id/tabNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/bg_tab_chip"
+            android:gravity="center"
+            android:minWidth="96dp"
+            android:paddingHorizontal="22dp"
+            android:text="抽数字"
+            android:textColor="@color/tab_text_color"
+            android:textSize="15sp" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <FrameLayout
+        android:id="@+id/panelContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="78dp"
+        android:layout_marginBottom="82dp">
+
+        <include android:id="@+id/panelDice" layout="@layout/panel_dice" />
+        <include android:id="@+id/panelCoin" layout="@layout/panel_coin" />
+        <include android:id="@+id/panelNumber" layout="@layout/panel_number" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/hintText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="34dp"
+        android:gravity="center"
+        android:text="@string/random_hint_dice"
+        android:textColor="@color/on_surface_muted"
+        android:textSize="13sp" />
+
+    <TextView
+        android:id="@+id/countButton"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_count_button"
+        android:gravity="center"
+        android:text="@string/random_dice_count_short"
+        android:textColor="@color/on_surface"
+        android:textSize="14sp" />
+</FrameLayout>

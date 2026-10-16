@@ -1,0 +1,23 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+build/
+.gradle/
+local.properties
+*.apk
+*.aab
+.idea/
+.DS_Store
+
+# 构建与分发包不入库：它们是产物，每次改版都会新增几十 MB
+# （要用 GitHub 分发 APK，建议走 Releases，而不是塞进 git 历史）
+dist/*.apk
+dist/*.zip
+
+# 签名密钥与本地 SDK 路径，绝不入库
+keystore.properties
+*.jks
+*.keystore
+local.properties

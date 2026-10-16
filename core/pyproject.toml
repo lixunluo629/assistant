@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qrlogin"
+version = "1.0.0"
+description = "扫码登录助手核心库：二维码识别 -> 平台判定 -> 唤起官方 App / 引导下载"
+readme = "../README.md"
+requires-python = ">=3.9"
+dependencies = []          # 零第三方依赖，只用标准库
+
+[project.scripts]
+qrlogin = "qrlogin.cli:main"
+
+[tool.setuptools]
+packages = ["qrlogin"]
+
+[tool.setuptools.package-data]
+qrlogin = ["platform_rules.json"]

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="最小值"
+            app:boxStrokeColor="@color/brand"
+            app:hintTextColor="@color/on_surface_muted">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/numberFrom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned"
+                android:text="1"
+                android:textColor="@color/on_surface"
+                android:textColorHint="@color/on_surface_muted" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <Space android:layout_width="8dp" android:layout_height="1dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="最大值"
+            app:boxStrokeColor="@color/brand"
+            app:hintTextColor="@color/on_surface_muted">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/numberTo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberSigned"
+                android:text="100"
+                android:textColor="@color/on_surface"
+                android:textColorHint="@color/on_surface_muted" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <Space android:layout_width="8dp" android:layout_height="1dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="个数"
+            app:boxStrokeColor="@color/brand"
+            app:hintTextColor="@color/on_surface_muted">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/numberCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="1"
+                android:textColor="@color/on_surface"
+                android:textColorHint="@color/on_surface_muted" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/numberUnique"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:checked="true"
+        android:text="@string/random_number_unique"
+        android:textColor="@color/on_surface" />
+
+    <Button
+        android:id="@+id/numberDraw"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:text="@string/random_number_draw" />
+
+    <TextView
+        android:id="@+id/numberResult"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:gravity="center"
+        android:minHeight="60dp"
+        android:textColor="@color/on_surface"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/numberResultSub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="@color/on_surface_muted"
+        android:textSize="13sp" />
+</LinearLayout>

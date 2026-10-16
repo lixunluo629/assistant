@@ -1,0 +1,2 @@
+152bd00c55963eea65ac556b627d7a827e0350c9b7fd2aec186917d7bdddf06a  assistant-1.6.0-debug.apk
+601a9ebc56e2dde0dddb27f5d27a6fb4d8ae0b5d4dab6f591674f6e115a41a32  assistant-1.6.0-release.apk

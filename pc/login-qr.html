@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>扫码登录助手 · PC 端登录页（演示）</title>
+<style>
+  :root {
+    --bg: #0f1420; --panel: #182031; --line: #2a3448; --text: #e6ebf4;
+    --muted: #8d9ab3; --brand: #3f8cff; --ok: #27c499; --warn: #ffb020; --danger: #ff5c5c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(1200px 600px at 20% -10%, #1b2740, var(--bg));
+    color: var(--text); font: 14px/1.7 "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    padding: 24px;
+  }
+  .shell { width: min(1040px, 100%); display: grid; grid-template-columns: 420px 1fr; gap: 20px; }
+  @media (max-width: 900px) { .shell { grid-template-columns: 1fr; } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .tab {
+    flex: 1 1 auto; min-width: 72px; padding: 8px 12px; text-align: center; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--line); background: transparent; color: var(--muted); font-size: 13px;
+    transition: .15s;
+  }
+  .tab.active { background: rgba(63,140,255,.14); border-color: var(--brand); color: var(--text); }
+  .qr-wrap { display: flex; justify-content: center; padding: 16px; background: #fff; border-radius: 12px; }
+  canvas { display: block; }
+  .meta { display: flex; justify-content: space-between; margin-top: 14px; font-size: 12px; color: var(--muted); }
+  .badge { color: var(--ok); }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 18px 0 6px; }
+  .url-box {
+    display: flex; gap: 8px;
+  }
+  input[readonly] {
+    flex: 1; min-width: 0; padding: 10px 12px; border-radius: 9px; border: 1px solid var(--line);
+    background: #0e1421; color: var(--muted); font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;
+  }
+  button.act {
+    padding: 10px 14px; border-radius: 9px; border: 1px solid var(--brand);
+    background: rgba(63,140,255,.14); color: var(--text); cursor: pointer; white-space: nowrap;
+  }
+  button.act:active { transform: translateY(1px); }
+  ol { padding-left: 20px; margin: 8px 0 0; }
+  ol li { margin-bottom: 8px; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 11px; border: 1px solid var(--line); color: var(--muted); }
+  .section { margin-top: 22px; }
+  .section h2 { font-size: 13px; margin: 0 0 6px; color: var(--text); }
+  .note { font-size: 12px; color: var(--muted); margin: 0; }
+  .hint { border-left: 2px solid var(--warn); padding-left: 10px; }
+  code { background: #0e1421; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="card">
+    <h1>账号登录</h1>
+    <div class="sub">用手机扫码登录 · 演示页面（二维码为假数据）</div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-platform="wechat">微信</button>
+      <button class="tab" data-platform="dingtalk">钉钉</button>
+      <button class="tab" data-platform="qq">QQ</button>
+      <button class="tab" data-platform="alipay">支付宝</button>
+      <button class="tab" data-platform="bilibili">哔哩哔哩</button>
+      <button class="tab" data-platform="wework">企业微信</button>
+      <button class="tab" data-platform="baidu">百度</button>
+      <button class="tab" data-platform="quark">夸克</button>
+      <button class="tab" data-platform="xiaohongshu">小红书</button>
+      <button class="tab" data-platform="douyin">抖音</button>
+      <button class="tab" data-platform="steam">Steam</button>
+    </div>
+
+    <div class="qr-wrap"><canvas id="qr" width="240" height="240"></canvas></div>
+
+    <div class="meta">
+      <span>有效期剩余 <b id="ttl">04:58</b></span>
+      <span class="badge">已识别平台：<b id="platform-label">微信</b></span>
+    </div>
+
+    <label for="qr-content">二维码内容（供助手 App 调试粘贴）</label>
+    <div class="url-box">
+      <input id="qr-content" readonly>
+      <button class="act" id="copy">复制</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h1>手机端会看到什么</h1>
+    <div class="sub">助手 App 只做「识别 + 唤起」，登录确认始终在官方 App 内完成</div>
+    <ol id="steps"></ol>
+
+    <div class="section">
+      <h2>安全边界</h2>
+      <p class="note">
+        助手 App 不联网、不上传二维码内容、不读取或缓存 <code>ticket</code> / <code>uuid</code>；
+        只把二维码里的域名与平台白名单比对，得出结论后立刻丢弃原文。
+        所有跳转链接都是常量白名单，绝不拼接二维码里的任何参数。
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>手动验证这条链路</h2>
+      <p class="note hint">
+        <code>cd core &amp;&amp; PYTHONPATH=. python3 -m qrlogin scan "&lt;上面复制的二维码内容&gt;" --installed wechat</code>
+      </p>
+    </div>
+
+    <div class="section">
+      <h2>说明</h2>
+      <p class="note">
+        本页只负责展示二维码，是演示用的静态页；真实项目里二维码图片与轮询接口由服务端提供。
+        切换平台会同时更新二维码内容，方便对照手机助手的识别结果。
+      </p>
+    </div>
+  </section>
+</div>
+
+<script>
+const SCENARIOS = {
+  wechat: {
+    label: "微信",
+    content: "https://login.weixin.qq.com/qrcode/DEMO2B0F9C1A?uuid=demo-uuid-4f2a",
+    steps: [
+      "识别出这是【微信】登录二维码（域名 login.weixin.qq.com 命中白名单）",
+      "检测到手机已安装微信 → 直接唤起微信并提示进入「扫一扫」",
+      "若未安装 → 引导去应用商店下载官方微信（微信无账号密码兜底入口）",
+      "你本人在微信里对准屏幕扫码，并在微信内手动点击「确认登录」"
+    ]
+  },
+  dingtalk: {
+    label: "钉钉",
+    content: "https://login.dingtalk.com/qr/DEMO9F2C?scene=qr_login&ticket=demo-ticket",
+    steps: [
+      "识别出这是【钉钉】登录二维码（域名 login.dingtalk.com 命中白名单）",
+      "检测到手机已安装钉钉 → 直接唤起钉钉并提示进入「扫一扫」",
+      "若未安装 → 引导下载官方钉钉，并可改用账号密码登录",
+      "你本人在钉钉里对准屏幕扫码，并在钉钉内手动点击「确认登录」"
+    ]
+  },
+  qq: {
+    label: "QQ",
+    content: "https://xui.ptlogin2.qq.com/cgi-bin/xlogin?appid=716027609&s_url=https%3A%2F%2Fqun.qq.com%2F",
+    steps: [
+      "识别出这是【QQ】登录二维码（先按最长后缀排除 weixin.qq.com，再命中 qq.com）",
+      "检测到手机已安装 QQ → 直接唤起 QQ 并提示进入「扫一扫」",
+      "若未安装 → 引导下载官方 QQ，并可改用账号密码登录",
+      "你本人在 QQ 里对准屏幕扫码，并在 QQ 内手动点击「确认登录」"
+    ]
+  },
+  alipay: {
+    label: "支付宝",
+    content: "https://qr.alipay.com/2b0f9c1a9d?ticket=demo-ticket",
+    steps: [
+      "识别出这是【支付宝】登录二维码（域名 qr.alipay.com 命中白名单）",
+      "检测到手机已安装支付宝 → 直接打开支付宝的「扫一扫」",
+      "若未安装 → 引导下载官方支付宝，并可改用账号密码登录",
+      "你本人在支付宝里对准屏幕扫码，并在支付宝内手动点击「确认登录」"
+    ]
+  },
+  bilibili: {
+    label: "哔哩哔哩",
+    content: "https://passport.bilibili.com/login/QRLogin?qrcode_key=demo-2b0f9c1a",
+    steps: [
+      "识别出这是【哔哩哔哩】登录二维码（域名 passport.bilibili.com 命中白名单）",
+      "已安装 → 自动打开 bilibili://qrscan（扫一扫）",
+      "未安装 → 引导下载官方 App，并可改用账号密码登录",
+      "你本人在 B 站里对准屏幕扫码并手动确认登录"
+    ]
+  },
+  wework: {
+    label: "企业微信",
+    content: "https://work.weixin.qq.com/wework_admin/loginpage_wx?code=demo",
+    steps: [
+      "识别出这是【企业微信】登录二维码（域名 work.weixin.qq.com 命中白名单）",
+      "企业微信没有对第三方开放扫一扫，会自动打开 App 主界面",
+      "未安装 → 引导下载官方 App，并可改用账号密码登录",
+      "你本人在企业微信里点「扫一扫」并手动确认登录"
+    ]
+  },
+  baidu: {
+    label: "百度",
+    content: "https://passport.baidu.com/v2/?login&tpl=mn",
+    steps: [
+      "识别出这是【百度】登录二维码（域名 passport.baidu.com 命中白名单）",
+      "已安装 → 自动打开 baiduboxapp://v16/ucenter/scan（扫一扫）",
+      "未安装 → 引导下载官方 App，并可改用账号密码登录",
+      "你本人在百度 App 里对准屏幕扫码并手动确认登录"
+    ]
+  },
+  quark: {
+    label: "夸克",
+    content: "https://pan.quark.cn/list#/list/all?token=demo",
+    steps: [
+      "识别出这是【夸克】登录二维码（域名 pan.quark.cn 命中白名单）",
+      "夸克没有对第三方开放扫一扫，会自动打开 App 主界面",
+      "未安装 → 引导下载官方 App，并可改用账号密码登录",
+      "你本人在夸克里点「扫一扫」并手动确认登录"
+    ]
+  },
+  xiaohongshu: {
+    label: "小红书",
+    content: "https://www.xiaohongshu.com/login?qr=demo-9f2c",
+    steps: [
+      "识别出这是【小红书】登录二维码（域名 xiaohongshu.com 命中白名单）",
+      "已安装 → 自动打开 xhsdiscover://qr_scan（扫一扫）",
+      "未安装 → 引导下载官方 App（小红书网页版无账号密码登录）",
+      "你本人在小红书里对准屏幕扫码并手动确认登录"
+    ]
+  },
+  douyin: {
+    label: "抖音",
+    content: "https://www.douyin.com/?modal_id=demo-7a1b",
+    steps: [
+      "识别出这是【抖音】登录二维码（域名 douyin.com 命中白名单）",
+      "已安装 → 自动打开 snssdk1128://aweme/scan（扫一扫）",
+      "未安装 → 引导下载官方 App（抖音网页版无账号密码登录）",
+      "你本人在抖音里对准屏幕扫码并手动确认登录"
+    ]
+  },
+  steam: {
+    label: "Steam",
+    content: "https://s.team/q/1/demo2b0f9c1a",
+    steps: [
+      "识别出这是【Steam】登录二维码（域名 s.team 命中白名单）",
+      "扫一扫入口未验证（国内应用商店没有 Steam 包），会打开 Steam App",
+      "未安装 → 引导下载官方 App，并可改用账号密码登录",
+      "你本人在 Steam App 的「扫码登录」里完成确认"
+    ]
+  }
+};
+
+// 演示用伪二维码：确定性图案，仅用于视觉占位（真实项目应渲染服务端返回的二维码图）
+function drawFakeQr(canvas, seedText) {
+  const ctx = canvas.getContext("2d");
+  const size = 240, cells = 25, pad = 12, cell = (size - pad * 2) / cells;
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, size, size);
+  let h = 2166136261;
+  for (const ch of seedText) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  const rnd = () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return ((h >>> 0) % 1000) / 1000; };
+  ctx.fillStyle = "#0f1420";
+  for (let y = 0; y < cells; y++) {
+    for (let x = 0; x < cells; x++) {
+      const inFinder = (x < 8 && y < 8) || (x > cells - 9 && y < 8) || (x < 8 && y > cells - 9);
+      if (inFinder) continue;
+      if (rnd() > 0.55) ctx.fillRect(pad + x * cell, pad + y * cell, cell, cell);
+    }
+  }
+  const finder = (ox, oy) => {
+    ctx.fillRect(pad + ox * cell, pad + oy * cell, 7 * cell, 7 * cell);
+    ctx.fillStyle = "#fff"; ctx.fillRect(pad + (ox + 1) * cell, pad + (oy + 1) * cell, 5 * cell, 5 * cell);
+    ctx.fillStyle = "#0f1420"; ctx.fillRect(pad + (ox + 2) * cell, pad + (oy + 2) * cell, 3 * cell, 3 * cell);
+  };
+  finder(0, 0); finder(cells - 7, 0); finder(0, cells - 7);
+}
+
+const canvas = document.getElementById("qr");
+const input = document.getElementById("qr-content");
+const stepsEl = document.getElementById("steps");
+const labelEl = document.getElementById("platform-label");
+let current = "wechat";
+
+function render(key) {
+  const s = SCENARIOS[key];
+  current = key;
+  drawFakeQr(canvas, s.content);
+  input.value = s.content;
+  labelEl.textContent = s.label;
+  stepsEl.innerHTML = s.steps.map(t => "<li>" + t + "</li>").join("");
+  document.querySelectorAll(".tab").forEach(t =>
+    t.classList.toggle("active", t.dataset.platform === key));
+}
+
+document.getElementById("tabs").addEventListener("click", e => {
+  const tab = e.target.closest(".tab");
+  if (tab) render(tab.dataset.platform);
+});
+
+document.getElementById("copy").addEventListener("click", async () => {
+  const btn = document.getElementById("copy");
+  try {
+    await navigator.clipboard.writeText(input.value);
+    btn.textContent = "已复制";
+  } catch {
+    input.select();
+    document.execCommand && document.execCommand("copy");
+    btn.textContent = "手动复制";
+  }
+  setTimeout(() => (btn.textContent = "复制"), 1200);
+});
+
+let remain = 298;
+setInterval(() => {
+  remain = remain > 0 ? remain - 1 : 298;
+  const m = String(Math.floor(remain / 60)).padStart(2, "0");
+  const sec = String(remain % 60).padStart(2, "0");
+  document.getElementById("ttl").textContent = m + ":" + sec;
+}, 1000);
+
+render(current);
+</script>
+</body>
+</html>
