@@ -6,6 +6,8 @@
     <color name="on_surface">#E6EBF4</color>
     <color name="on_surface_muted">#8D9AB3</color>
     <color name="brand">#3F8CFF</color>
+    <!-- 菜单图标、设置按钮、开关 -->
+    <color name="menu_accent">#8B6CFF</color>
 
     <!-- 随机事件的强调色（参考魅族的红色胶囊） -->
     <color name="accent">#E8322D</color>

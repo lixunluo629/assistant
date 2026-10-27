@@ -3,16 +3,68 @@
     <string name="app_name">小助手</string>
 
     <!-- 首页（功能菜单） -->
-    <string name="home_subtitle">常用工具集合，功能陆续添加</string>
-    <string name="home_footer">更多功能正在路上</string>
-    <string name="chevron">›</string>
+    <string name="home_title">小助手</string>
+    <string name="menu_settings">设置</string>
+    <string name="menu_empty">没有显示的工具</string>
+    <string name="action_back">返回</string>
 
     <!-- 功能：扫码登录助手 -->
-    <string name="tool_scan_login_title">扫码登录助手</string>
+    <string name="tool_scan_login_title">扫码助手</string>
     <string name="tool_scan_login_desc">扫描 PC 登录页二维码，自动识别平台并打开对应 App（微信 / 钉钉 / QQ / 支付宝）</string>
     <string name="scan_subtitle">对准 PC 屏幕上的登录二维码，登录确认始终在官方 App 内完成</string>
 
     <!-- 功能：随机事件 -->
+    <string name="tool_otp_title">动态令牌</string>
+    <string name="tool_otp_desc">按时间变化的验证码，加密后同步到账号</string>
+    <string name="otp_add">添加令牌</string>
+    <string name="otp_scan">扫描二维码</string>
+    <string name="otp_scan_frame">将方框对准二维码</string>
+    <string name="otp_account">账号</string>
+    <string name="otp_manual">输入激活码</string>
+    <string name="otp_label">标签</string>
+    <string name="otp_account_name">账号</string>
+    <string name="otp_secret">激活码</string>
+    <string name="otp_save">保存</string>
+    <string name="otp_delete">删除</string>
+    <string name="otp_delete_confirm">确定删除「%1$s」吗？</string>
+    <string name="otp_copied">验证码已复制</string>
+    <string name="otp_empty">还没有令牌</string>
+    <string name="otp_remain">%1$d 秒</string>
+    <string name="otp_bound">已绑定 %1$s</string>
+    <string name="otp_unbound">未绑定账号，卸载后令牌会丢失</string>
+    <string name="otp_server">服务器地址</string>
+    <string name="otp_server_hint">http://8.138.34.69:8007</string>
+    <string name="otp_username">用户名</string>
+    <string name="otp_password">密码</string>
+    <string name="otp_register">注册并绑定</string>
+    <string name="otp_login">登录并同步</string>
+    <string name="otp_logout">退出登录</string>
+    <string name="otp_logged_in">已登录，正在同步</string>
+    <string name="otp_registered">注册成功，正在同步</string>
+    <string name="otp_logged_out">已退出，本机令牌还在</string>
+    <string name="otp_server_invalid">服务器地址要以 http:// 或 https:// 开头</string>
+    <string name="otp_username_invalid">用户名只能用字母、数字、点、下划线和横线</string>
+    <string name="otp_password_short">密码至少 8 位</string>
+    <string name="otp_secret_invalid">激活码格式不对</string>
+    <string name="otp_qr_invalid">这不是动态令牌二维码，请换 otpauth 二维码或改用激活码</string>
+    <string name="otp_account_hint">令牌会加密后存到云端。密码只留在手机上，卸载后用同一个账号密码可以找回。</string>
+    <string name="update_check">检查更新</string>
+    <string name="update_checking">正在检查更新</string>
+    <string name="update_latest">当前已是最新版本</string>
+    <string name="update_current">当前版本 %1$s</string>
+    <string name="update_found">最新版本 %1$s</string>
+    <string name="update_title">发现新版本</string>
+    <string name="update_now">立即更新</string>
+    <string name="update_later">稍后</string>
+    <string name="update_downloading">正在下载更新</string>
+    <string name="update_progress_known">%1$d%%　%2$s / %3$s</string>
+    <string name="update_progress_unknown">已下载 %1$s</string>
+    <string name="update_cancel_hint">按返回键取消下载</string>
+    <string name="update_installing">正在打开安装界面</string>
+    <string name="update_failed">更新下载失败</string>
+    <string name="update_bad_file">安装包校验失败</string>
+    <string name="update_allow_install">请先允许安装应用，再回来点更新</string>
+
     <string name="tool_random_title">随机事件</string>
     <string name="tool_random_desc">掷骰子、抛硬币、抽数字，点一下就来</string>
     <string name="random_placeholder">—</string>

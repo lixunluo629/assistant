@@ -1,0 +1,22 @@
+services:
+  vault:
+    build: .
+    image: assistant-vault:1
+    container_name: assistant-vault
+    restart: unless-stopped
+    ports:
+      - "8007:8765"
+    environment:
+      DATA_DIR: /data
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?set ADMIN_PASSWORD in .env}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://8.138.34.69:8007}
+      APP_PACKAGE: ${APP_PACKAGE:-com.szpdc.assistant}
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8765/v1/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

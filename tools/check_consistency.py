@@ -41,9 +41,12 @@ FORBIDDEN_QR_PAYLOAD_PARAMS = (
     "result=", "data=", "url=", "content=", "ticket=", "code=",
 )
 
+# 动态令牌的加密云同步需要 INTERNET。ACCESS_NETWORK_STATE 仍然不允许被依赖库合并进来。
 FORBIDDEN_PERMISSIONS = {
-    "android.permission.INTERNET",
     "android.permission.ACCESS_NETWORK_STATE",
+}
+REQUIRED_PERMISSIONS = {
+    "android.permission.INTERNET",
 }
 TEMPLATE_MARKERS = ("{", "}", "%s", "%d", "$", "+")
 
@@ -297,26 +300,31 @@ def check_kotlin_parser_semantics() -> None:
 
 
 def check_network_permission_is_removed() -> None:
-    """F：网络权限必须显式移除。
+    """F：ACCESS_NETWORK_STATE 必须移除；INTERNET 只留给动态令牌的加密同步。
 
-    ML Kit 依赖库会声明 INTERNET / ACCESS_NETWORK_STATE，manifest merger 会合并进来，
-    所以"我没写"不等于"APK 里没有"。一旦被合并，"绝不上传二维码"的系统级保证就没了。
+    ML Kit 会声明这两个权限。ACCESS_NETWORK_STATE 用 tools:node="remove" 挡掉。
+    INTERNET 由本应用自己声明，供令牌库上传密文；扫码登录的代码仍然不发请求。
     """
     root = ET.parse(MANIFEST).getroot()
-    seen: set[str] = set()
+    seen_removed: set[str] = set()
+    declared: set[str] = set()
     for permission in root.findall("uses-permission"):
         name = permission.get(ANDROID_NS + "name")
-        if name not in FORBIDDEN_PERMISSIONS:
-            continue
-        seen.add(name)
-        if permission.get(TOOLS_NS + "node") != "remove":
-            fail(f"清单声明了 {name} 却没有 tools:node=\"remove\"："
-                 "依赖库合并后会真的获得网络权限，破坏\u201c绝不上传二维码\u201d的承诺")
-
-    if seen:
-        notes.append(f"已显式移除网络权限：{'、'.join(sorted(seen))}")
+        if name in FORBIDDEN_PERMISSIONS:
+            seen_removed.add(name)
+            if permission.get(TOOLS_NS + "node") != "remove":
+                fail(f"清单声明了 {name} 却没有 tools:node=\"remove\"")
+        if name in REQUIRED_PERMISSIONS and permission.get(TOOLS_NS + "node") != "remove":
+            declared.add(name)
+    if seen_removed:
+        notes.append(f"已显式移除网络权限：{'、'.join(sorted(seen_removed))}")
     else:
-        notes.append("清单未出现网络权限声明")
+        fail("清单没有用 tools:node=\"remove\" 移除 ACCESS_NETWORK_STATE")
+    missing = REQUIRED_PERMISSIONS - declared
+    if missing:
+        fail("动态令牌云同步需要声明且不要 remove 的权限：" + "、".join(sorted(missing)))
+    else:
+        notes.append("已声明 INTERNET（仅供令牌密文同步）")
 
     # ElementTree 不把 xmlns:tools 当作普通属性，因此用文本方式校验命名空间声明
     manifest_text = MANIFEST.read_text(encoding="utf-8")

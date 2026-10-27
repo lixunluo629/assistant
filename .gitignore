@@ -1,4 +1,8 @@
 __pycache__/
+server/vault.db
+server/.env
+server/data/
+server/_deploy_once.py
 *.py[cod]
 .pytest_cache/
 .venv/

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingStart="4dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/action_back"
+            android:padding="12dp"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/otp_add"
+            android:textColor="@color/on_surface"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/scanButton"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_tool_card"
+        android:gravity="center"
+        android:text="@string/otp_scan"
+        android:textColor="@color/menu_accent"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/manualButton"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_tool_card"
+        android:gravity="center"
+        android:text="@string/otp_manual"
+        android:textColor="@color/menu_accent"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/manualForm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="18dp"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/labelInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_tool_card"
+            android:hint="@string/otp_label"
+            android:inputType="text"
+            android:padding="14dp"
+            android:textColor="@color/on_surface"
+            android:textColorHint="@color/on_surface_muted" />
+
+        <EditText
+            android:id="@+id/accountInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_tool_card"
+            android:hint="@string/otp_account_name"
+            android:inputType="text"
+            android:padding="14dp"
+            android:textColor="@color/on_surface"
+            android:textColorHint="@color/on_surface_muted" />
+
+        <EditText
+            android:id="@+id/secretInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_tool_card"
+            android:hint="@string/otp_secret"
+            android:inputType="textVisiblePassword"
+            android:padding="14dp"
+            android:textColor="@color/on_surface"
+            android:textColorHint="@color/on_surface_muted" />
+
+        <TextView
+            android:id="@+id/saveButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_tool_card"
+            android:gravity="center"
+            android:text="@string/otp_save"
+            android:textColor="@color/menu_accent"
+            android:textSize="16sp" />
+    </LinearLayout>
+</LinearLayout>

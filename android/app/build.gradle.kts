@@ -30,8 +30,8 @@ android {
         applicationId = "com.szpdc.assistant"
         minSdk = 24
         targetSdk = 34
-        versionCode = 12
-        versionName = "1.6.0"
+        versionCode = 20
+        versionName = "1.7.7"
 
         // 只打包真机常用的 ABI，去掉模拟器用的 x86/x86_64，APK 体积从 26MB 降到 12MB 左右
         ndk {
@@ -85,6 +85,7 @@ tasks.named("preBuild") {
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("com.google.android.material:material:1.11.0")
 
     val camerax = "1.3.1"

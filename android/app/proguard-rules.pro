@@ -18,6 +18,7 @@
 # 3) 这些类体量很小，keep 的代价可以忽略。
 -keep class com.szpdc.assistant.feature.** { *; }
 -keep class com.szpdc.assistant.HomeActivity { *; }
+-keep class com.szpdc.assistant.UpdateInstallReceiver { *; }
 
 # 保留行号，崩溃栈才有意义；同时保留源文件名
 -keepattributes SourceFile,LineNumberTable
